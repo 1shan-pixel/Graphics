@@ -59,6 +59,6 @@ for i, frequency in enumerate(hist):
                 histogram[y, x + bw] = 1
 
 # Visualizing the histogram
-plt.imshow(histogram, cmap='autumn', origin='lower')
+plt.imshow(histogram, cmap='gray', origin='lower')
 plt.title('Histogram using Bresenham\'s Line Algorithm')
 plt.show()
