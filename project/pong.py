@@ -18,6 +18,7 @@ RETRY_BUTTON_HEIGHT = 50
 # Initialize Pygame
 pygame.init()
 pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), DOUBLEBUF | OPENGL)
+pygame.display.set_caption("Ping Pong!")
 
 # Set up OpenGL
 gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT)
@@ -144,7 +145,7 @@ def game_over_screen():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     # Draw "GAME OVER" text
-    game_over_text = "GAME OVER"
+    game_over_text = "GAME OVER!!!"
     text_width, text_height = game_over_font.size(game_over_text)
     text_x = (WINDOW_WIDTH - text_width) // 2
     text_y = (WINDOW_HEIGHT - text_height) // 2 + 50
@@ -172,8 +173,13 @@ def game_over_screen():
 
 # Main game loop
 retry_button_pressed = False
+# Define score variables
+left_player_score = 0
+right_player_score = 0
+
 while True:
-    if game_over:
+    score_diff = abs(left_player_score-right_player_score)
+    if score_diff>5:
         game_over_screen()
         if retry_button_pressed:
             reset_game()
@@ -200,8 +206,23 @@ while True:
         ball.move()
 
         # Check for game over (ball goes out of bounds)
-        if ball.x + BALL_SIZE < 0 or ball.x > WINDOW_WIDTH:
-            game_over = True
+
+        if ball.x + BALL_SIZE < 0:
+            # Left player missed, update score
+            left_player_score += 1
+            reset_game()
+            print(left_player_score)
+            # Reset game after a point is scored
+
+        elif ball.x > WINDOW_WIDTH:
+            # Right player missed, update score
+            right_player_score += 1
+            reset_game()
+            print(right_player_score)
+            # Reset game after a point is scored
+        # ... rest of the ball.move() logic
+
+    
 
         left_paddle.draw()
         right_paddle.draw()
