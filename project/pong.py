@@ -18,12 +18,10 @@ RETRY_BUTTON_HEIGHT = 50
 # Initialize Pygame
 pygame.init()
 pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), DOUBLEBUF | OPENGL)
-pygame.display.set_caption("Ping Pong!")
 
 # Set up OpenGL
 gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT)
 glClearColor(0, 0, 0, 1)
-
 
 # Define paddle class
 class Paddle:
@@ -47,7 +45,6 @@ class Paddle:
     def move_down(self):
         if self.y > 0:
             self.y -= PADDLE_SPEED
-
 
 # Define ball class
 class Ball:
@@ -88,7 +85,6 @@ class Ball:
         ):
             self.dx *= -1
 
-
 # Create paddles and ball objects
 def reset_game():
     global left_paddle, right_paddle, ball, game_over
@@ -106,14 +102,10 @@ reset_game()
 game_over_font = pygame.font.SysFont("Times New Roman", FONT_SIZE)
 button_font = pygame.font.SysFont("Times New Roman", FONT_SIZE)
 
-
 def draw_text(text, font, color, x, y):
-    text_surface = font.render(text, True, (0, 0, 0), (255, 255, 255))
-
+    text_surface = font.render(text, True, (0,0,0), color)
     text_data = pygame.image.tostring(text_surface, "RGBA", True)
-    glPushMatrix()
-    glTranslatef(x, y, 0)
-    glRasterPos2f(0, 0)
+    glRasterPos2f(x, y)
     glDrawPixels(
         text_surface.get_width(),
         text_surface.get_height(),
@@ -121,14 +113,11 @@ def draw_text(text, font, color, x, y):
         GL_UNSIGNED_BYTE,
         text_data,
     )
-    glPopMatrix()
-
 
 def draw_button(x, y, width, height, text):
     glColor3f(1, 1, 1)
     glBegin(GL_QUADS)
     glVertex2f(x, y)
-    glVertex2f
     glVertex2f(x + width, y)
     glVertex2f(x + width, y + height)
     glVertex2f(x, y + height)
@@ -138,14 +127,13 @@ def draw_button(x, y, width, height, text):
     text_y = y + (height - button_font.size(text)[1]) // 2
     draw_text(text, button_font, (255, 0, 0), text_x, text_y)
 
-
 def game_over_screen():
     global retry_button_pressed
     glClearColor(0.2, 0.2, 0.2, 1.0)  # Dark gray background
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     # Draw "GAME OVER" text
-    game_over_text = "GAME OVER!!!"
+    game_over_text = "GAME OVER"
     text_width, text_height = game_over_font.size(game_over_text)
     text_x = (WINDOW_WIDTH - text_width) // 2
     text_y = (WINDOW_HEIGHT - text_height) // 2 + 50
@@ -172,18 +160,16 @@ def game_over_screen():
 
 
 # Main game loop
-retry_button_pressed = False
-# Define score variables
-left_player_score = 0
-right_player_score = 0
-
+left_player_score = 0 
+right_player_score = 0 
+retry_button_pressed =False
 while True:
     score_diff = abs(left_player_score-right_player_score)
-    if score_diff>5:
+    if score_diff >= 2 or game_over:
+        game_over = True
         game_over_screen()
         if retry_button_pressed:
             reset_game()
-            retry_button_pressed = False
     else:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
@@ -206,27 +192,29 @@ while True:
         ball.move()
 
         # Check for game over (ball goes out of bounds)
-
         if ball.x + BALL_SIZE < 0:
             # Left player missed, update score
-            left_player_score += 1
-            reset_game()
-            print(left_player_score)
-            # Reset game after a point is scored
-
-        elif ball.x > WINDOW_WIDTH:
-            # Right player missed, update score
             right_player_score += 1
             reset_game()
-            print(right_player_score)
-            # Reset game after a point is scored
-        # ... rest of the ball.move() logic
-
-    
+        elif ball.x > WINDOW_WIDTH:
+            # Right player missed, update score
+            left_player_score += 1
+            reset_game()
 
         left_paddle.draw()
         right_paddle.draw()
         ball.draw()
 
+        left_score_x = 20  # Left margin
+        left_score_y = WINDOW_HEIGHT - FONT_SIZE - 10  # Bottom of the screen
+
+        right_score_x = WINDOW_WIDTH - 50 
+        right_score_y = left_score_y  # Same y-position as left score
+
+        # Draw left and right player scores
+        draw_text(str(left_player_score), game_over_font, (255, 0, 255), left_score_x, left_score_y)
+        draw_text(str(right_player_score), game_over_font, (255, 0, 255), right_score_x, right_score_y)
+
         pygame.display.flip()
+
         pygame.time.wait(10)
