@@ -7,7 +7,7 @@ def init_window(width, height):
         return None
 
     window = glfw.create_window(width, height, "2D Transformations", None, None)
-    if not window:
+    if not window: 
         glfw.terminate()
         return None
 
@@ -16,80 +16,76 @@ def init_window(width, height):
     return window
 
 def plot_shape(points):
-    glBegin(GL_LINE_LOOP)
+    glBegin(GL_LINE_LOOP) 
     for point in points.T:
         glVertex2f(point[0], point[1])
     glEnd()
 
-def translate(points, tx, ty):
-    T = np.array([
+def translate_matrix(tx, ty):
+    return np.array([
         [1, 0, tx],
         [0, 1, ty],
         [0, 0,  1]
     ])
-    return T @ points
 
-def rotate(points, theta):
+def rotate_matrix(theta):
     theta = np.radians(theta)
-    R = np.array([
+    return np.array([
         [np.cos(theta), -np.sin(theta), 0],
         [np.sin(theta),  np.cos(theta), 0],
         [0,             0,             1]
     ])
-    return R @ points
 
-def scale(points, sx, sy):
-    S = np.array([
+def scale_matrix(sx, sy):
+    return np.array([
         [sx, 0,  0],
         [0,  sy, 0],
         [0,  0,  1]
     ])
-    return S @ points
 
-def reflect(points, axis):
+def reflect_matrix(axis):
     if axis == 'x':
-        R = np.array([
+        return np.array([
             [1,  0, 0],
             [0, -1, 0],
             [0,  0, 1]
         ])
     elif axis == 'y':
-        R = np.array([
+        return np.array([
             [-1, 0, 0],
             [0,  1, 0],
             [0,  0, 1]
         ])
     elif axis == 'origin':
-        R = np.array([
+        return np.array([
             [-1, 0, 0],
             [0, -1, 0],
             [0,  0, 1]
         ])
-    return R @ points
 
-def shear(points, shx, shy):
-    Sh = np.array([
+def shear_matrix(shx, shy):
+    return np.array([
         [1, shx, 0],
         [shy, 1, 0],
         [0,  0, 1]
     ])
-    return Sh @ points
 
-def composite_transform(points, transformations):
-    result = points
+def composite_transform_matrix(transformations):
+    composite_matrix = np.eye(3)
     for transform in transformations:
-        result = transform(result)
-    return result
+        composite_matrix = transform @ composite_matrix
+    return composite_matrix
 
 def main():
     window = init_window(800, 600)
     if not window:
         return
 
+   
     points = np.array([
-        [0, 100, 100, 0],
-        [0, 0,  100, 100],
-        [1, 1,  1,  1]
+        [0, 100, 50],
+        [0, 0,  100],
+        [1, 1,  1]
     ])
 
     while not glfw.window_should_close(window):
@@ -99,38 +95,14 @@ def main():
         glColor3f(1.0, 0.0, 0.0)  # Red
         plot_shape(points)
 
-        # Translated shape
-        translated_points = translate(points, 200, 100)
-        glColor3f(0.0, 1.0, 0.0)  # Green
-        plot_shape(translated_points)
-
-        # Rotated shape
-        rotated_points = rotate(points, 45)
-        glColor3f(0.0, 0.0, 1.0)  # Blue
-        plot_shape(rotated_points)
-
-        # Scaled shape
-        scaled_points = scale(points, 2, 0.5)
-        glColor3f(1.0, 1.0, 0.0)  # Yellow
-        plot_shape(scaled_points)
-
-        # Reflected shape
-        reflected_points = reflect(points, 'y')
-        glColor3f(0.0, 1.0, 1.0)  # Cyan
-        plot_shape(reflected_points)
-
-        # Sheared shape
-        sheared_points = shear(points, 1, 0)
-        glColor3f(1.0, 0.0, 1.0)  # Magenta
-        plot_shape(sheared_points)
-
         # Composite transformation: translate, then rotate, then scale
         transformations = [
-            lambda pts: translate(pts, 200, 100),
-            lambda pts: rotate(pts, 45),
-            lambda pts: scale(pts, 1.5, 1.5)
+            translate_matrix(50, 50),
+            rotate_matrix(45),
+            scale_matrix(1.5, 1.5)
         ]
-        composite_points = composite_transform(points, transformations)
+        composite_matrix = composite_transform_matrix(transformations)
+        composite_points = composite_matrix @ points
         glColor3f(1.0, 1.0, 1.0)  # White
         plot_shape(composite_points)
 

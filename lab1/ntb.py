@@ -105,7 +105,7 @@ def draw():
 
     # Blit the text onto the screen at the bottom left corner of the logo
     screen.blit(text_surface, (70, 850))
-    pygame.display.flip()
+    pygame.display.flip() # Update the display
 
 def main():
     # Initialize Pygame

@@ -21,7 +21,7 @@ def plot_shape(points):
         glVertex2f(point[0], point[1])
     glEnd()
 
-def shear(points, shx, shy):
+def shear(points, shx, shy): #currently only doing shearing along X axis. 
     Sh = np.array([
         [1, shx, 0],
         [shy, 1, 0],
@@ -48,7 +48,8 @@ def main():
         plot_shape(points)
 
         # Sheared shape
-        sheared_points = shear(points, 1, 0.5)
+        sheared_points = shear(points, 1, 0)
+        #only doing shearing across X-axis right now. 
         glColor3f(0.0, 1.0, 0.0)  # Green
         plot_shape(sheared_points)
 

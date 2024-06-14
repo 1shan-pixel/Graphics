@@ -6,6 +6,7 @@ def dda_line(x0, y0, x1, y1):
     steps = abs(dx) if abs(dx) > abs(dy) else abs(dy)
     x_inc = dx / steps
     y_inc = dy / steps
+    #if m>1 , then inc will be m , if less than 1 , then inc will be 1/m
 
     x = x0
     y = y0
