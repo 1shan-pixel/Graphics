@@ -14,9 +14,9 @@ window = pygame.display.set_mode((window_width, window_height), pygame.OPENGL | 
 pygame.display.set_caption("Welcome to Pong!")
 
 # Load and play background music
-pong_sound = pygame.mixer.Sound("pong.wav")
-
-background_music_path = "bg.mp3"  # Ensure this path is correct
+pong_sound_music_path = "assets/pong.wav"
+background_music_path = "assets/bg.mp3"  # Ensure this path is correct
+pong_sound = pygame.mixer.Sound(pong_sound_music_path)
 pygame.mixer.music.load(background_music_path)
 
 pygame.mixer.music.play(-1)  # Play music indefinitely
@@ -34,7 +34,7 @@ setup_opengl()
 
 # Set up fonts
 # Assuming the font file is named 'Orbitron-Regular.ttf' and is located in the project folder
-font_path = "Orbitron-Regular.ttf"
+font_path = "assets/Orbitron-Regular.ttf"
 font_size = 32
 font = pygame.font.Font(font_path, font_size)
 
@@ -73,7 +73,7 @@ def draw_text(text, x, y, font_size=None, color=(255, 255, 255)):
 # Function to draw a rectangle
 def draw_rect(x, y, width, height, color):
     glColor3fv(color)
-    glBegin(GL_QUADS)
+    glBegin(GL_QUADS) 
     glVertex2f(x, y)
     glVertex2f(x + width, y)
     glVertex2f(x + width, y + height)
@@ -193,9 +193,9 @@ def settings_screen():
                 elif event.key == pygame.K_s:
                     paddle_height = max(10, paddle_height - 10)
                 elif event.key == pygame.K_a:
-                    ball_speed += 0.1
+                    ball_speed = round(ball_speed + 0.1, 1)  # Increase and round to one decimal
                 elif event.key == pygame.K_d:
-                    ball_speed = max(0.1, ball_speed - 0.1)
+                    ball_speed = max(0.1, round(ball_speed - 0.1, 1))  # Decrease and round to one decimal
                 elif event.key == pygame.K_z:
                     ball_size += 1
                 elif event.key == pygame.K_x:
